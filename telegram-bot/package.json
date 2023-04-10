@@ -1,0 +1,23 @@
+{
+  "name": "telegram-bot",
+  "version": "1.0.0",
+  "description": "Телеграм бот от команды \"Интернет кузница\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/temajm/mp-forge.git"
+  },
+  "author": "temajm & lebedev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/temajm/mp-forge/issues"
+  },
+  "homepage": "https://github.com/temajm/mp-forge#readme",
+  "dependencies": {
+    "mysql": "^2.18.1",
+    "node-telegram-bot-api": "^0.61.0"
+  }
+}
