@@ -1,14 +1,15 @@
-
+import Telegram from "../core/telegram.js"
+import LogSystem from "../core/logSystem.js";
 
 export default class Chat {
 
-    chat_id = undefined;
+    id = undefined;
 
     constructor(chat_id) {
-        this.chat_id = chat_id;
+        this.id = chat_id;
     }
 
-    sendMessage = (text) => {
-
+    sendMessage = (text, options) => {
+        return Telegram.get().sendMessage(this.id, text, options).catch(LogSystem.error);
     }
 }

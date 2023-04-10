@@ -28,7 +28,15 @@ export default class Config {
         new ConfigFile(
             "../configs/telegram.json",
             "telegram"
-        )
+        ),
+        new ConfigFile(
+            "../configs/commands.json",
+            "commands"
+        ),
+        new ConfigFile(
+            "../configs/keyboards.json",
+            "keyboards"
+        ),
     ];
 
     static loadData = () => {

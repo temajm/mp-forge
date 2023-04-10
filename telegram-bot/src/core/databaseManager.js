@@ -44,7 +44,7 @@ export default class DatabaseManager {
 
     static addUser = (user_id) => {
         return new Promise(((resolve, reject) => {
-            DatabaseManager.mysqlConnection.query('INSERT INTO `users` (`id`) VALUES (`?`)', [user_id], (error, results, fields) => {
+            DatabaseManager.mysqlConnection.query('INSERT INTO `users` (`id`) VALUES (\'?\')', [user_id], (error, results, fields) => {
                 this.#handleData(resolve, reject, error, results, fields);
             })
         }))

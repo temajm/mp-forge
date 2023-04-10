@@ -3,15 +3,14 @@ import Chat from "./chat.js";
 
 class User {
 
-    user_id = undefined;
+    id = undefined;
     chat = undefined;
 
     constructor(user_id,
                 chat_id = undefined) {
-        this.user_id = user_id;
-
-        if(chat_id){
-            this.chat = new Chat(chat_id)
+        this.id = user_id;
+        if(chat_id !== undefined){
+            this.chat = new Chat(chat_id);
         }
 
         this.#loadData();
@@ -22,14 +21,20 @@ class User {
     }
 
     #register = () => {
-
+        return Core.DatabaseManager.addUser(this.id);
     }
 
     #loadData = () => {
-        Core.DatabaseManager.searchUserById(this.user_id).then((data) => {
+        Core.DatabaseManager.searchUserById(this.id).then((data) => {
             if(data.length === 0) {
-                this.#register();
+                this.#register().then(()=>{
+                    this.#loadData();
+                })
+                return;
+            }
 
+            for (const dataKey in data) {
+                this[dataKey] = data;
             }
         });
     }

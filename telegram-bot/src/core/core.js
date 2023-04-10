@@ -3,14 +3,18 @@ import LogSystem from "./logSystem.js"
 import Config from "./config.js";
 import User from "../components/user.js"
 import Telegram from "./telegram.js";
+import Commands from "./commands.js";
+import Buttons from "./buttons.js";
+import Keyboards from "./keyboards.js";
 
 export default class Core {
     static LogSystem = LogSystem;
     static Config = Config;
     static DatabaseManager = DatabaseManager;
+    static Keyboards = Keyboards;
 
-    static createUser = (user_id) => {
-        return new User(user_id);
+    static createUser = (user_id, chat_id) => {
+        return new User(user_id, chat_id);
     }
 
     static initialize = () => {
@@ -28,9 +32,14 @@ export default class Core {
                         polling: true
                     }
                 );
+                Keyboards.load();
                 DatabaseManager.connect().then(() => {
                     LogSystem.log(`Database is connected!`, true);
-                    resolve();
+                    Commands.loadListener().then(()=>{
+                        Buttons.loadListener().then(() => {
+                            resolve();
+                        })
+                    })
                 })
             })
         })

@@ -1,0 +1,12 @@
+{
+  "list": {
+    "general": {
+      "buttons": [
+        [
+          {"text": "test", "callback_data": "testCallback"}
+        ]
+      ],
+      "type": "inline_keyboard"
+    }
+  }
+}
