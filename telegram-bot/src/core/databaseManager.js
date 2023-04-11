@@ -14,7 +14,7 @@ export default class DatabaseManager {
         });
     }
 
-    static connect = () => {
+    static connect = async() => {
         return new Promise((resolve, reject) => {
             DatabaseManager.mysqlConnection.connect((error) => {
                 if(error) {
@@ -50,8 +50,15 @@ export default class DatabaseManager {
         }))
     }
 
+    static setUserLang = (user_id, lang) => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('UPDATE `users` SET `lang` = ? WHERE `id` = ?', [lang, user_id], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+
     static getFormattedStringByTitle = (title, lang) => {
-        console.log(`lang = ${lang}`)
         return new Promise(((resolve, reject) => {
             DatabaseManager.mysqlConnection.query('SELECT * FROM `languages` WHERE `lang` = ? AND `title` = ?', [lang, title], (error, results, fields) => {
                 this.#handleData(resolve, reject, error, results, fields);

@@ -7,16 +7,15 @@ export default class Buttons {
     static _btnInstances = [];
     static isLoaded = false;
 
-    static callEvent = (msg) => {
+    static callEvent = async(user, msg) => {
         if(msg?.data == null && typeof msg?.data !== "string") {
             return;
         }
-        const data = msg.data.toLowerCase().split(" ");
+        const args = msg.data.toLowerCase().split(" ");
         for (let i = 0; i < Buttons._btnInstances.length; i++) {
             const btn = Buttons._btnInstances[i];
-            console.log(btn);
-            if(btn.getCallbackData() === data[0]) {
-                btn.run(msg);
+            if(btn.getCallbackData() === args[0]) {
+                await btn.run(user, msg, args);
                 return;
             }
         }
@@ -49,8 +48,10 @@ export default class Buttons {
                             continue;
                         }
 
-                        import(`../buttons/${btn.callback_data}.js`).then((data) => {
-                            const cmdInstance = new data.default(btn.text, btn.callback_data.toLowerCase());
+                        const callback_data = btn.callback_data.split(" ")[0]
+
+                        import(`../buttons/${callback_data}.js`).then((data) => {
+                            const cmdInstance = new data.default(btn.text, callback_data.toLowerCase());
                             if(cmdInstance?.run == null) { // check validate
                                 LogSystem.error(`Button ${btn.callback_data} is invalid (not found run method)!`);
                                 loadButton(id + 1);

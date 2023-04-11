@@ -1,10 +1,12 @@
 {
   "list": {
-    "general": {
+    "welcome": {
       "buttons": [
         [
-          {"text": "test", "callback_data": "testCallback"},
-          {"text": "test app", "web_app": {"url": "https://127.0.0.1:3001/"}}
+          {"text": "button_switch_to", "callback_data": "welcomeSwitchLang"}
+        ],
+        [
+          {"text": "button_next", "callback_data": "welcomeNext"}
         ]
       ],
       "type": "inline_keyboard"

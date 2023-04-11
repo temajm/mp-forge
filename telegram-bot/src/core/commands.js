@@ -7,7 +7,7 @@ export default class Commands {
     static _cmdInstances = [];
     static isLoaded = false;
 
-    static callEvent = (msg) => {
+    static callEvent = async(user, msg) => {
         if(!Commands.isLoaded){
             return;
         }
@@ -19,7 +19,7 @@ export default class Commands {
         for (let i = 0; i < this._cmdInstances.length; i++) {
             const cmd = this._cmdInstances[i];
             if(cmd.getAbsoluteName() === args[0]) {
-                cmd.run(msg);
+                await cmd.run(user, msg, args);
                 return;
             }
         }

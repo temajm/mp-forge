@@ -6,15 +6,10 @@ export default class commandTest extends Command{
         super(name, description);
     }
 
-    run = (msg) => {
-        const user = Core.createUser(msg.from.id, msg.chat.id);
-        user.loadData().then(() => {
-            user.getText("text_welcome").then((data)=>{
-                user.getChat().sendMessage(data, {
-                    reply_markup: {...Core.Keyboards.build('general')},
-                    parse_mode: "html"
-                });
-            })
+    run = async(user, msg, args) => {
+        const keyboard = await user.buildKeyboard('welcome',{"welcomeswitchlang": [user.lang === "ru" ? "en" : "ru"]});
+        await user.sendMessage("text_welcome", {
+            reply_markup: {...keyboard}
         })
         /*
         console.log(Core.Keyboards.build('general'))

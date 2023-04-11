@@ -7,9 +7,7 @@ export default class buttonTestCallback extends Button{
         super(text, callback_data);
     }
 
-    run = (msg) => {
-        console.log("run")
-        console.log(msg);
+    run = (msg, args) => {
         const user = Core.createUser(msg.from.id, msg.message.chat.id);
         user.getChat().sendMessage("ok", {
             reply_markup: {...Core.Keyboards.build('general', {

@@ -17,32 +17,27 @@ export default class Core {
         return new User(user_id, chat_id);
     }
 
-    static initialize = () => {
-        return new Promise((resolve, reject) => {
-            Config.loadData().then(()=>{
-                DatabaseManager.set(
-                    Config.database.host,
-                    Config.database.username,
-                    Config.database.password,
-                    Config.database.databaseName
-                )
-                Telegram.set(
-                    Config.telegram.token,
-                    {
-                        polling: true
-                    }
-                );
-                Keyboards.load();
-                DatabaseManager.connect().then(() => {
-                    LogSystem.log(`Database is connected!`, true);
-                    Commands.loadListener().then(()=>{
-                        Buttons.loadListener().then(() => {
-                            Telegram.registerListener();
-                            resolve();
-                        })
-                    })
-                })
-            })
-        })
+    static initialize = async() => {
+        await Config.loadData();
+        DatabaseManager.set(
+            Config.database.host,
+            Config.database.username,
+            Config.database.password,
+            Config.database.databaseName
+        )
+        Telegram.set(
+            Config.telegram.token,
+            {
+                polling: true
+            }
+        );
+
+        Keyboards.load();
+        await DatabaseManager.connect()
+        LogSystem.log(`Database is connected!`, true);
+        await Commands.loadListener()
+        await Buttons.loadListener()
+        Telegram.registerListener();
+
     }
 }

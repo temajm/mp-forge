@@ -1,6 +1,7 @@
 import TelegramAPI from "node-telegram-bot-api"
 import Commands from "./commands.js";
 import Buttons from "./buttons.js";
+import Core from "./core.js";
 
 export default class Telegram {
 
@@ -18,11 +19,24 @@ export default class Telegram {
     }
 
     static registerListener = () => {
-        Telegram.get().on("message", (msg) => {
-            Commands.callEvent(msg);
+        Telegram.get().on("message", async(msg) => {
+            const user = Core.createUser(msg.from.id, msg.chat.id);
+            const exist = await user.loadData();
+            if(!exist) {
+                return;
+            }
+
+            await Commands.callEvent(user, msg);
         });
-        Telegram.get().on("callback_query", (msg) => {
-            Buttons.callEvent(msg);
+        Telegram.get().on("callback_query", async(msg) => {
+            const user = Core.createUser(msg.from.id, msg.message.chat.id);
+            const exist = await user.loadData();
+            if(!exist) {
+                return;
+            }
+            user.setCurrentMessage(msg.message);
+
+            await Buttons.callEvent(user, msg);
         });
     }
 }

@@ -11,3 +11,15 @@ export const DeepCopy = (obj) => {
 
     return outObj;
 }
+
+export const IsValidLang = (lang) => {
+    const langs = ["ru", "en"];
+
+    for (let i = 0; i < langs.length; i++) {
+        if(langs[i] === lang) {
+            return true;
+        }
+    }
+
+    return false;
+}

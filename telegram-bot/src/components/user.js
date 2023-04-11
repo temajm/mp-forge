@@ -2,89 +2,103 @@ import Core from "../core/core.js"
 import Chat from "./chat.js";
 import Telegram from "../core/telegram.js";
 import LogSystem from "../core/logSystem.js";
+import CurrentMessage from "./currentMessage.js";
 
 class User {
     id = undefined;
     firstName = undefined;
     lastName = undefined;
     fatherName = undefined;
-    chat = undefined;
     lang = undefined;
+    currentMessage_id = undefined;
+    currentMessage_date = undefined;
+
+    _chat = undefined;
+    _currentMessage = undefined;
 
     constructor(user_id,
                 chat_id = undefined) {
         this.id = user_id;
         if(chat_id !== undefined){
-            this.chat = new Chat(chat_id);
+            this._chat = new Chat(chat_id);
         }
     }
 
     getChat = () => {
-        return this.chat;
+        return this._chat;
     }
 
-    getText = (title) => {
-        return new Promise((resolve, reject) => {
-            Core.DatabaseManager.getFormattedStringByTitle(title, this.lang).then((data) => {
-                console.log(data);
-                if(data == null || data.length === 0){
-                    LogSystem.error(`Not found text title ${title} (lang: ${this.lang})`)
-                    reject();
-                    return;
-                }
-                const strF = data[0].text;
-                strF.replace(/{([^}]*)}/g, (match, command) => {
-                    if(typeof command !== "string"){
-                        return `{${command}}`;
-                    }
-
-                    const args = command.toLowerCase().split(" ");
-                    switch (args[0]) {
-                        case "user.id":
-                            return this.id;
-                        case "user.firstName":
-                            return this.firstName;
-                        case "user.lastName":
-                            return this.lastName;
-                        case "user.lastName":
-                            return this.lastName;
-                        default:
-                            return `{${command}}`;
-                    }
-                });
-                resolve(strF);
-            });
-        })
+    setLang = async(lang) => {
+        await Core.DatabaseManager.setUserLang(this.id, lang);
+        this.lang = lang;
     }
 
-    sendMessage = (text, options) => {
-        if(this.getChat()){
-            return this.getChat().sendMessage(text, options)
+    buildKeyboard = (name, argsOfButton = null) => {
+        return Core.Keyboards.build(this, name, argsOfButton);
+    }
+
+    setCurrentMessage = (msg) => {
+        this._currentMessage = new CurrentMessage(this, msg)
+    }
+
+
+    getText = async(title) => {
+        const data = await Core.DatabaseManager.getFormattedStringByTitle(title, this.lang);
+        if(data == null || data.length === 0){
+            LogSystem.error(`Not found text title ${title} (lang: ${this.lang})`)
+            return null;
+        }
+        const strF = data[0].text;
+        strF.replace(/{([^}]*)}/g, (match, command) => {
+            if(typeof command !== "string"){
+                return `{${command}}`;
+            }
+
+            const args = command.toLowerCase().split(" ");
+            switch (args[0]) {
+                case "user.id":
+                    return this.id;
+                case "user.firstName":
+                    return this.firstName;
+                case "user.lastName":
+                    return this.lastName;
+                default:
+                    return `{${command}}`;
+            }
+        });
+        return strF;
+    }
+
+    getCurrentMessage = () => {
+        return this._currentMessage;
+    }
+
+    sendMessage = async(text, options) => {
+        const gText = await this.getText(text);
+        let data = null;
+
+        if (this.getChat()) {
+            return await this.getChat().sendMessage(gText, options)
         }
 
-        return Telegram.get().sendMessage(this.id, text, options).catch(LogSystem.error);
+        return await Telegram.get().sendMessage(this.id, gText, options).catch(LogSystem.error);
     }
 
-    #register = () => {
-        return Core.DatabaseManager.addUser(this.id);
+    register = async() => {
+        await Core.DatabaseManager.addUser(this.id);
     }
 
-    loadData = () => {
-        return new Promise((resolve, reject) => {
-            Core.DatabaseManager.searchUserById(this.id).then((data) => {
-                if(data.length === 0) {
-                    this.#register().then(()=>{
-                        this.loadData();
-                    })
-                    return;
-                }
-                data = data[0]
-                for (const dataKey in data) {
-                    this[dataKey] = data[dataKey];
-                }
-                resolve();
-            });
-        })
+    loadData = async() => {
+        let data = await Core.DatabaseManager.searchUserById(this.id);
+        if(data.length === 0) {
+            return false;
+        }
+
+        data = data[0]
+        for (const dataKey in data) {
+            this[dataKey] = data[dataKey];
+        }
+        return true;
     }
 
 
