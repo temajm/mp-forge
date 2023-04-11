@@ -6,6 +6,7 @@ import NavigatorComponent from "./components/Navigator";
 import NavigatorElement from "./components/NavigatorElement";
 import FormError from "./forms/FormError";
 import FormCreateCompany from "./forms/FormCreateCompany";
+import { io } from "socket.io-client"
 
 const Telegram = window.Telegram.WebApp
 
@@ -17,6 +18,11 @@ class App extends React.Component {
         this.state = {
             activePanel: ''
         }
+        let socket = io.connect("http://127.0.0.1:3003", {
+            secure: true,
+            transports: ["websocket"]
+        })
+        console.log(socket)
     }
 
 
