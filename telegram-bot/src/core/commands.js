@@ -5,6 +5,25 @@ import LogSystem from "./logSystem.js";
 export default class Commands {
 
     static _cmdInstances = [];
+    static isLoaded = false;
+
+    static callEvent = (msg) => {
+        if(!Commands.isLoaded){
+            return;
+        }
+
+        if(msg?.text == null && typeof msg?.text !== "string") {
+            return;
+        }
+        let args = msg.text.toLowerCase().split(" ");
+        for (let i = 0; i < this._cmdInstances.length; i++) {
+            const cmd = this._cmdInstances[i];
+            if(cmd.getAbsoluteName() === args[0]) {
+                cmd.run(msg);
+                return;
+            }
+        }
+    }
 
     static loadListener = () => {
         return new Promise((resolve, reject) => {
@@ -12,19 +31,7 @@ export default class Commands {
                 Telegram.get().setMyCommands(this._cmdInstances.map((value) => {
                     return {"command": value.getName(), "description": value.getDescription()}
                 })).catch(LogSystem.error);
-                Telegram.get().on("message", (msg) => {
-                    if(msg?.text == null && typeof msg?.text !== "string") {
-                        return;
-                    }
-                    let args = msg.text.toLowerCase().split(" ");
-                    for (let i = 0; i < this._cmdInstances.length; i++) {
-                        const cmd = this._cmdInstances[i];
-                        if(cmd.getAbsoluteName() === args[0]) {
-                            cmd.run(msg);
-                            return;
-                        }
-                    }
-                })
+                Commands.isLoaded = true;
 
                 resolve();
             }

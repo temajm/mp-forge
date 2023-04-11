@@ -8,9 +8,21 @@ export default class commandTest extends Command{
 
     run = (msg) => {
         const user = Core.createUser(msg.from.id, msg.chat.id);
+        user.loadData().then(() => {
+            user.getText("text_welcome").then((data)=>{
+                user.getChat().sendMessage(data, {
+                    reply_markup: {...Core.Keyboards.build('general')},
+                    parse_mode: "html"
+                });
+            })
+        })
+        /*
         console.log(Core.Keyboards.build('general'))
-        user.getChat().sendMessage("test", {
-            reply_markup: {...Core.Keyboards.build('general')}
-        });
+        user.getText("welcome_text").then((data)=>{
+            user.getChat().sendMessage(data, {
+                reply_markup: {...Core.Keyboards.build('general')},
+                parse_mode: "html"
+            });
+        })*/
     }
 }

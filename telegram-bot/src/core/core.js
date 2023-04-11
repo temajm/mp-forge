@@ -37,6 +37,7 @@ export default class Core {
                     LogSystem.log(`Database is connected!`, true);
                     Commands.loadListener().then(()=>{
                         Buttons.loadListener().then(() => {
+                            Telegram.registerListener();
                             resolve();
                         })
                     })

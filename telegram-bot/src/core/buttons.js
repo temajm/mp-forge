@@ -5,6 +5,22 @@ import LogSystem from "./logSystem.js";
 export default class Buttons {
 
     static _btnInstances = [];
+    static isLoaded = false;
+
+    static callEvent = (msg) => {
+        if(msg?.data == null && typeof msg?.data !== "string") {
+            return;
+        }
+        const data = msg.data.toLowerCase().split(" ");
+        for (let i = 0; i < Buttons._btnInstances.length; i++) {
+            const btn = Buttons._btnInstances[i];
+            console.log(btn);
+            if(btn.getCallbackData() === data[0]) {
+                btn.run(msg);
+                return;
+            }
+        }
+    }
 
     static loadListener = () => {
         return new Promise((resolve, reject) => {
@@ -15,22 +31,7 @@ export default class Buttons {
             }
 
             const registerListener = () => {
-                console.log("registerListener");
-                console.log(Buttons._btnInstances)
-                Telegram.get().on("callback_query", (msg) => {
-                    if(msg?.data == null && typeof msg?.data !== "string") {
-                        return;
-                    }
-                    const data = msg.data.toLowerCase().split(" ");
-                    for (let i = 0; i < Buttons._btnInstances.length; i++) {
-                        const btn = Buttons._btnInstances[i];
-                        console.log(btn);
-                        if(btn.getCallbackData() === data[0]) {
-                            btn.run(msg);
-                            return;
-                        }
-                    }
-                })
+                Buttons.isLoaded = true;
 
                 resolve();
             }

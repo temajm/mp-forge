@@ -1,4 +1,6 @@
 import TelegramAPI from "node-telegram-bot-api"
+import Commands from "./commands.js";
+import Buttons from "./buttons.js";
 
 export default class Telegram {
 
@@ -13,5 +15,14 @@ export default class Telegram {
 
     static get = () => {
         return Telegram._inst;
+    }
+
+    static registerListener = () => {
+        Telegram.get().on("message", (msg) => {
+            Commands.callEvent(msg);
+        });
+        Telegram.get().on("callback_query", (msg) => {
+            Buttons.callEvent(msg);
+        });
     }
 }

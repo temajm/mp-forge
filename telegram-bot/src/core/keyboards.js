@@ -23,13 +23,34 @@ export default class Keyboards {
         const keyboard = {};
         const keyboardInfo = Core.Config.keyboards.list[name];
         keyboard[keyboardInfo.type] = DeepCopy(keyboardInfo.buttons);
+
+        for (let i = 0; i < keyboard[keyboardInfo.type].length; i++) {
+            const btnLine = keyboard[keyboardInfo.type][i];
+            for (let j = 0; j < btnLine.length; j++) {
+                const btn = btnLine[j];
+                if(btn?.callback_data.toLowerCase() === argsOfButtonKey.toLowerCase()){
+                    btn.callback_data = `${argsOfButtonKey} ${argsOfButton[argsOfButtonKey].join(" ")}`
+                }
+
+                if(typeof argsOfButton === "object") {
+                    for (const argsOfButtonKey in argsOfButton) {
+                        if (!Array.isArray(argsOfButton[argsOfButtonKey]) || argsOfButton[argsOfButtonKey].length === 0) {
+                            continue;
+                        }
+
+                    }
+                }
+
+            }
+        }
+
         if(typeof argsOfButton === "object"){
             for (const argsOfButtonKey in argsOfButton) {
                 if(!Array.isArray(argsOfButton[argsOfButtonKey]) && argsOfButton[argsOfButtonKey].length > 0) {
                     continue;
                 }
-                for (let i = 0; i < keyboardInfo.buttons.length; i++) {
-                    const btnLine = keyboardInfo.buttons[i];
+                for (let i = 0; i < keyboard[keyboardInfo.type].length; i++) {
+                    const btnLine = keyboard[keyboardInfo.type][i];
                     for (let j = 0; j < btnLine.length; j++) {
                         const btn = btnLine[j];
                         if(btn?.callback_data.toLowerCase() === argsOfButtonKey.toLowerCase()){

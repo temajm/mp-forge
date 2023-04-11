@@ -50,6 +50,15 @@ export default class DatabaseManager {
         }))
     }
 
+    static getFormattedStringByTitle = (title, lang) => {
+        console.log(`lang = ${lang}`)
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT * FROM `languages` WHERE `lang` = ? AND `title` = ?', [lang, title], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+
     static searchUserById = (user_id) => {
         return new Promise(((resolve, reject) => {
             DatabaseManager.mysqlConnection.query('SELECT * FROM `users` WHERE `id` = ?', [user_id], (error, results, fields) => {
