@@ -58,6 +58,58 @@ export default class DatabaseManager {
         }))
     }
 
+    static removeLangText = (title) => {
+        return new Promise((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('DELETE FROM `languages` WHERE `title` = ?', [title], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        });
+    }
+
+    static addLangText = (title, ru, en) => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('INSERT INTO `languages` (`id`, `title`, `text`, `lang`, `isSystem`) VALUES (NULL, ?, ?, \'ru\', \'0\')', [title, ru], (error, results, fields) => {
+                DatabaseManager.mysqlConnection.query('INSERT INTO `languages` (`id`, `title`, `text`, `lang`, `isSystem`) VALUES (NULL, ?, ?, \'en\', \'0\')', [title, en], (error, results, fields) => {
+                    this.#handleData(resolve, reject, error, results, fields);
+                })
+            })
+        }))
+    }
+
+    static getFAQAll = () => {
+        return new Promise((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT * FROM `FAQ`', [], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        })
+    }
+
+    static findLangTextByTitle = (title) => {
+        return new Promise((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT * FROM `languages` WHERE `title` = ?', [title], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        })
+    }
+
+    static setLangText = (title, ru, en) => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('UPDATE `languages` SET `text` = ? WHERE `lang` = \'ru\' AND `title` = ?', [ru, title], (error, results, fields) => {
+                DatabaseManager.mysqlConnection.query('UPDATE `languages` SET `text` = ? WHERE `lang` = \'en\' AND `title` = ?', [en, title], (error, results, fields) => {
+                    this.#handleData(resolve, reject, error, results, fields);
+                })
+            })
+        }))
+    }
+
+    static getLangTexts = () => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT * FROM `languages`', [], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+
     static getFormattedStringByTitle = (title, lang) => {
         return new Promise(((resolve, reject) => {
             DatabaseManager.mysqlConnection.query('SELECT * FROM `languages` WHERE `lang` = ? AND `title` = ?', [lang, title], (error, results, fields) => {

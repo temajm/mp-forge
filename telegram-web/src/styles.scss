@@ -1,0 +1,13 @@
+body[theme="light"] {
+  --text-color: rgba(0, 0, 0, 0.88);
+  --bg-content-hint: rgba(255, 255, 255, 0.8);
+}
+
+body[theme="dark"] {
+  --text-color: rgba(255, 255, 255, 0.85);
+  --bg-content-hint: #141414;
+}
+
+.ant-collapse-header{
+  align-items: center !important;
+}

@@ -7,6 +7,7 @@ import Commands from "./commands.js";
 import Buttons from "./buttons.js";
 import Keyboards from "./keyboards.js";
 import Socket from "../webApi/socket.js";
+import Web from "../webApi/web.js";
 
 export default class Core {
     static LogSystem = LogSystem;
@@ -39,6 +40,6 @@ export default class Core {
         await Commands.loadListener()
         await Buttons.loadListener()
         Telegram.registerListener();
-        Socket.initialize()
+        Web.initialize()
     }
 }
