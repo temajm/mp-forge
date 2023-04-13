@@ -8,13 +8,13 @@ export default class buttonWelcomeNext extends Button{
     }
 
     run = async(user, msg, args) => {
-        if(user.role !== 0){
+        if(user.role !== 1){
             return;
         }
-        user.setCurrentStage("welcome_enter_name");
-        const keyboard = await user.buildKeyboard('cancel',{"welcomeCancel": [user.getCurrentStage()]});
-        await user.sendMessage("text_welcome_enter_name", {
-            reply_markup: {...keyboard},
-        })
+        if(args.length !== 3){
+            return;
+        }
+        const keyboard = await user.buildKeyboard(args[2]);
+        await user.getCurrentMessage().edit(args[1], keyboard)
     }
 }

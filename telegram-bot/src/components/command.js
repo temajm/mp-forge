@@ -15,7 +15,7 @@ export default class Command {
         return `/${this.getName()}`
     }
     getDescription = () => {
-        return this.description;
+        return this?.description;
     }
 
     run = (msg) => {};

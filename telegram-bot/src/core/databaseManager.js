@@ -10,7 +10,8 @@ export default class DatabaseManager {
             host     : host,
             user     : user,
             password : password,
-            database : database
+            database : database,
+            charset : 'utf8mb4'
         });
     }
 
@@ -42,9 +43,48 @@ export default class DatabaseManager {
         resolve(results, fields);
     }
 
-    static addUser = (user_id) => {
+    static setUserDataById = (user_id, firstName, lastName, sex) => {
         return new Promise(((resolve, reject) => {
-            DatabaseManager.mysqlConnection.query('INSERT INTO `users` (`id`) VALUES (\'?\')', [user_id], (error, results, fields) => {
+            DatabaseManager.mysqlConnection.query('UPDATE `users` SET `firstName` = ?, `lastName` = ?, `sex` = ?, `role` = 1 WHERE `id` = ?', [firstName, lastName, sex, user_id], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+
+    static addUser = (user_id, firstName, lastName, divisionId) => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('INSERT INTO `users` (`id`, `firstName`, `lastName`, `divisionId`) VALUES (?, ?, ?, ?)', [user_id, firstName, lastName, divisionId], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+
+    static getFAQListCount = () => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT COUNT(*) as \'count\' FROM `faq`', [], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+    static getFAQListByOffset = (offset = 0) => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT * FROM `faq` ORDER BY `id` ASC LIMIT ?, 6', [offset], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+
+    static findDivisionByInviteCode = (inviteCode) => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT * FROM `divisions` WHERE `inviteCode` = ?', [inviteCode], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+
+    static findDivisionById = (id) => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT * FROM `divisions` WHERE `id` = ?', [id], (error, results, fields) => {
                 this.#handleData(resolve, reject, error, results, fields);
             })
         }))
@@ -76,9 +116,49 @@ export default class DatabaseManager {
         }))
     }
 
+    static getFAQContentById = (id) => {
+        return new Promise((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT * FROM `faq` WHERE `id` = ?', [id], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        })
+    }
+
+    static removeFAQContentById = (id) => {
+        return new Promise((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('DELETE FROM `faq` WHERE `id` = ?', [id], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        })
+    }
+
+    static setFAQContentById = (id, question, answer) => {
+        return new Promise((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('UPDATE `faq` SET `question` = ?, `answer` = ? WHERE `id` = ?', [question, answer, id], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        })
+    }
+
+    static addFAQContent = (question, answer) => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('INSERT INTO `faq` (`id`, `question`, `answer`) VALUES (NULL, ?, ?)', [question, answer], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+
     static getFAQAll = () => {
         return new Promise((resolve, reject) => {
-            DatabaseManager.mysqlConnection.query('SELECT * FROM `FAQ`', [], (error, results, fields) => {
+            DatabaseManager.mysqlConnection.query('SELECT * FROM `faq`', [], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        })
+    }
+
+    static getLangListPseudo = () => {
+        return new Promise((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT `title` FROM `languages`', [], (error, results, fields) => {
                 this.#handleData(resolve, reject, error, results, fields);
             })
         })
@@ -113,6 +193,14 @@ export default class DatabaseManager {
     static getFormattedStringByTitle = (title, lang) => {
         return new Promise(((resolve, reject) => {
             DatabaseManager.mysqlConnection.query('SELECT * FROM `languages` WHERE `lang` = ? AND `title` = ?', [lang, title], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+
+    static getDivisionMembers = (id) => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT * FROM `users` WHERE `divisionId` = ? AND `role` = 1', [id], (error, results, fields) => {
                 this.#handleData(resolve, reject, error, results, fields);
             })
         }))

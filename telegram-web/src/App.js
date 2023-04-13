@@ -8,6 +8,7 @@ import LangPanel from "./panels/LangPanel";
 
 import axios from "axios"
 import FAQPanel from "./panels/FAQPanel";
+import DivisionsPanel from "./panels/DivisionsPanel";
 
 function getItem(label, key, icon, children) {
     return {
@@ -128,7 +129,7 @@ class App extends React.Component {
 const App = () => {
     const [collapsed, setCollapsed] = useState(window.innerWidth < 600);
     const [selectedTheme, setSelectedTheme] = useState("dark");
-    const [selectedMenuItem, setSelectedMenuItem] = useState('FAQ');
+    const [selectedMenuItem, setSelectedMenuItem] = useState('divisions');
 
     const [apiNotif, contextHolder] = notification.useNotification();
 
@@ -137,9 +138,9 @@ const App = () => {
     })
 
     const panels = {
-        general: <GeneralPanel apiNotification={apiNotif} key={'2'}/>,
-        lang: <LangPanel apiNotification={apiNotif} key={'1'} />,
-        FAQ: <FAQPanel apiNotification={apiNotif} key={'3'} />
+        general: {inst: <GeneralPanel apiNotification={apiNotif} key={'2'}/>, title: "Главная"},
+        lang: {inst: <LangPanel apiNotification={apiNotif} key={'2'}/>, title: "Языки"},
+        FAQ: {inst: <FAQPanel apiNotification={apiNotif} key={'2'}/>, title: "FAQ"},
     }
     let currentPanel = panels.general;
     if(panels[selectedMenuItem] != null){
@@ -150,11 +151,11 @@ const App = () => {
         getItem('Статистика', 'statics', <BarChartOutlined />),
         getItem('Языки', 'lang', <CommentOutlined />),
         getItem('Пользователи', 'users', <UserOutlined />),
-        getItem('Подразделения', 'division', <TeamOutlined />),
+        getItem('Подразделения', 'divisions', <TeamOutlined />),
         getItem('Задания', 'tasks', <DatabaseOutlined />),
         getItem('FAQ', 'FAQ', <QuestionCircleOutlined />),
-        getItem(<div className={"ticketButton"}><div className={"title"}>Обращения <div style={{background: theme.defaultConfig.token.colorError}} className={"dot"}></div></div> </div>, 'tickets', <ExclamationCircleOutlined />),
-        getItem('О компании', 'company', <FormOutlined />),
+        //getItem(<div className={"ticketButton"}><div className={"title"}>Обращения <div style={{background: theme.defaultConfig.token.colorError}} className={"dot"}></div></div> </div>, 'tickets', <ExclamationCircleOutlined />),
+        //getItem('О компании', 'company', <FormOutlined />),
         getItem('Светлая тема', 'theme', selectedTheme === "light" ? <BulbFilled style={{color:  "#FFEB3B"}} /> : <BulbOutlined />),
     ];
 
@@ -198,7 +199,7 @@ const App = () => {
                     <Layout.Header
                         className={"mainHeader"}
                     >
-                        Главная
+                        {currentPanel.title}
                     </Layout.Header>
                     <Layout.Content
                         style={{
@@ -209,7 +210,7 @@ const App = () => {
                         }}
                         className={"mainContent"}
                     >
-                        {currentPanel}
+                        {currentPanel.inst}
                     </Layout.Content>
                     <Layout.Footer style={{ textAlign: 'center' }}>Команда "Интернет кузница" / "Internet Forge" (Code Rocks 2023)</Layout.Footer>
                 </Layout>

@@ -1,6 +1,29 @@
 {
   "list": [
     {
+      "name": "start"
+    },
+    {
+      "name": "menu",
+      "description": "Главное меню"
+    },
+    {
+      "name": "instructions",
+      "description": "Инструкции"
+    },
+    {
+      "name": "company",
+      "description": "Информация о компании"
+    },
+    {
+      "name": "division",
+      "description": "Информация о подразделении"
+    },
+    {
+      "name": "settings",
+      "description": "Настройки"
+    },
+    {
       "name": "test",
       "description": "test"
     }

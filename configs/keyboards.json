@@ -1,5 +1,95 @@
 {
   "list": {
+    "menu_div": {
+      "buttons": [
+        [
+          {"text": "button_back", "callback_data": "back text_menu menu"}
+        ]
+      ],
+      "type": "inline_keyboard"
+    },
+    "menu_products": {
+      "buttons": [
+        [
+          {"text": "button_product_prev", "callback_data": "menuCompany products prev", "pseudo": "menuCompanyProductsPrev"},
+          {"text": "button_product_next", "callback_data": "menuCompany products next", "pseudo": "menuCompanyProductsNext"}
+        ],
+        [
+          {"text": "button_back", "callback_data": "menuCompany products back", "pseudo": "menuCompanyProductsBack"}
+        ]
+      ],
+      "type": "inline_keyboard"
+    },
+    "menu_company": {
+      "buttons": [
+        [
+          {"text": "button_products", "callback_data": "menuCompany products"}
+        ],
+        [
+          {"text": "button_back", "callback_data": "back text_menu menu"}
+        ]
+      ],
+      "type": "inline_keyboard"
+    },
+    "menu_settings_select_lang": {
+      "buttons": [
+        [
+          {"text": "button_select_lang_ru", "callback_data": "menuSettings select_lang ru"},
+          {"text": "button_select_lang_en", "callback_data": "menuSettings select_lang en"}
+        ],
+        [
+          {"text": "button_back", "callback_data": "back text_settings menu_settings"}
+        ]
+      ],
+      "type": "inline_keyboard"
+    },
+    "menu_settings": {
+      "buttons": [
+        [
+          {"text": "button_select_lang", "callback_data": "menuSettings select_lang"}
+        ],
+        [
+          {"text": "button_back", "callback_data": "back text_menu menu"}
+        ]
+      ],
+      "type": "inline_keyboard"
+    },
+    "menu": {
+      "buttons": [
+        [
+          {"text": "button_tasks", "callback_data": "menuTasks"}
+        ],
+        [
+          {"text": "button_div", "callback_data": "menuDiv"},
+          {"text": "button_company", "callback_data": "menuCompany"},
+          {"text": "button_faq", "callback_data": "menuFaq"}
+        ],
+        [
+          {"text": "button_settings", "callback_data": "menuSettings"}
+        ]
+      ],
+      "type": "inline_keyboard"
+    },
+    "welcome_sex": {
+      "buttons": [
+        [
+          {"text": "button_sex_male", "callback_data": "welcomeSexMale"},
+          {"text": "button_sex_female", "callback_data": "welcomeSexFemale"}
+        ],
+        [
+          {"text": "button_cancel", "callback_data": "welcomeCancel"}
+        ]
+      ],
+      "type": "inline_keyboard"
+    },
+    "cancel": {
+      "buttons": [
+        [
+          {"text": "button_cancel", "callback_data": "welcomeCancel"}
+        ]
+      ],
+      "type": "inline_keyboard"
+    },
     "welcome": {
       "buttons": [
         [

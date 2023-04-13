@@ -2,7 +2,7 @@ import Command from "../components/command.js";
 import Core from "../core/core.js";
 import Button from "../components/button.js"
 
-export default class buttonWelcomeNext extends Button{
+export default class buttonWelcomeFemale extends Button{
     constructor(text, callback_data) {
         super(text, callback_data);
     }
@@ -11,9 +11,14 @@ export default class buttonWelcomeNext extends Button{
         if(user.role !== 0){
             return;
         }
-        user.setCurrentStage("welcome_enter_name");
-        const keyboard = await user.buildKeyboard('cancel',{"welcomeCancel": [user.getCurrentStage()]});
-        await user.sendMessage("text_welcome_enter_name", {
+        if(args.length !== 3){
+            return;
+        }
+        args = msg.data.split(" ");
+        await Core.DatabaseManager.setUserDataById(user.id, args[1], args[2], "female");
+
+        const keyboard = await user.buildKeyboard('menu');
+        await user.sendMessage("text_menu", {
             reply_markup: {...keyboard},
         })
     }

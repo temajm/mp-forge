@@ -28,9 +28,19 @@ export default class Commands {
     static loadListener = () => {
         return new Promise((resolve, reject) => {
             const registerListener = () => {
-                Telegram.get().setMyCommands(this._cmdInstances.map((value) => {
-                    return {"command": value.getName(), "description": value.getDescription()}
-                })).catch(LogSystem.error);
+                const cmdsDesc = [];
+                for (let i = 0; i < this._cmdInstances.length; i++) {
+                    let cmd = this._cmdInstances[i];
+                    if(cmd.getDescription() == null){
+                        continue;
+                    }
+                    cmdsDesc.push({
+                        "command": cmd.getName(),
+                        "description": cmd.getDescription()
+                    })
+                }
+                console.log(cmdsDesc)
+                Telegram.get().setMyCommands(cmdsDesc).catch(LogSystem.error);
                 Commands.isLoaded = true;
 
                 resolve();

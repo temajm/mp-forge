@@ -21,7 +21,7 @@ export default class Web {
 
     static checkValidateParam = (res, param, type = []) => {
         let isFoundedType = false;
-        if(res.req.body[param] == null) {
+        if(res.req.body[param] == null && res.req.body[param] !== 0) {
             res.json(Web.genError(`Не найден параметр ${param}!`));
             return false;
         }
@@ -47,6 +47,50 @@ export default class Web {
             if(!Web.checkValidateParam(res, "method", ["string"])) return;
 
             switch (req.body.method) {
+                case "setFAQContent":
+                    if(!Web.checkValidateParam(res, "id", ["number"])) return;
+                    if(!Web.checkValidateParam(res, "question", ["string"])) return;
+                    if(!Web.checkValidateParam(res, "answer", ["string"])) return;
+                    Core.DatabaseManager.setFAQContentById(req.body.id, req.body.question, req.body.answer).then((data) => {
+                        res.json({"response": {
+                                status: "ok",
+                            }});
+                    }).catch((err) => {
+                        res.json(Web.genError("Произошла ошибка!"));
+                    });
+                    break;
+                case "removeFAQContent":
+                    if(!Web.checkValidateParam(res, "id", ["number"])) return;
+
+                    Core.DatabaseManager.getFAQContentById(req.body.id).then((data) => {
+                        if(data.length === 0){
+                            res.json(Web.genError(`Вопрос-ответ не найден под айди: ${req.body.id}!`));
+                            return;
+                        }
+                        Core.DatabaseManager.removeFAQContentById(req.body.id).then((data) => {
+                            res.json({"response": {
+                                    status: "ok",
+                                }});
+                        }).catch((err) => {
+                            res.json(Web.genError("Произошла ошибка!"));
+                        });
+                    }).catch((err) => {
+                        res.json(Web.genError("Произошла ошибка!"));
+                    });
+                    break;
+                case "addFAQContent":
+                    if(!Web.checkValidateParam(res, "question", ["string"])) return;
+                    if(!Web.checkValidateParam(res, "answer", ["string"])) return;
+
+                    Core.DatabaseManager.addFAQContent(req.body.question, req.body.answer).then((data) => {
+                        res.json({"response": {
+                                status: "ok",
+                                list: data
+                            }});
+                    }).catch((err) => {
+                        res.json(Web.genError("Произошла ошибка!"));
+                    });
+                    break;
                 case "getFAQContent":
                     Core.DatabaseManager.getFAQAll().then((data) => {
                         res.json({"response": {
@@ -57,11 +101,35 @@ export default class Web {
                         res.json(Web.genError("Произошла ошибка!"));
                     });
                     break;
+                case "getLangListPseudo":
+                    Core.DatabaseManager.getLangListPseudo().then((data) => {
+                        let arr = data.map((el) => {return el?.title});
+                        let out = [];
+                        for (let i = 0; i < arr.length; i++) {
+                            let isFounded = false;
+                            for (let j = 0; j < out.length; j++) {
+                                if(out[j] === arr[i]){
+                                    isFounded = true;
+                                    break;
+                                }
+                            }
+
+                            if(isFounded) continue;
+
+                            out.push(arr[i])
+                        }
+                        res.json({"response": {
+                                status: "ok",
+                                list: out
+                            }});
+                    }).catch((err) => {
+                        res.json(Web.genError("Произошла ошибка!"));
+                    })
+                    break;
                 case "removeLangText":
                     if(!Web.checkValidateParam(res, "title", ["string"])) return;
 
                     Core.DatabaseManager.findLangTextByTitle(req.body.title).then((data) => {
-                        console.log(data);
                         if (data.length === 0) {
                             res.json(Web.genError("Текст с таким названием не существует!"));
                             return;

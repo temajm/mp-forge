@@ -14,9 +14,10 @@ export default class Core {
     static Config = Config;
     static DatabaseManager = DatabaseManager;
     static Keyboards = Keyboards;
+    static Telegram = Telegram;
 
-    static createUser = (user_id, chat_id) => {
-        return new User(user_id, chat_id);
+    static createUser = (user_id, chat_id, first_name, last_name) => {
+        return new User(user_id, chat_id, first_name, last_name);
     }
 
     static initialize = async() => {

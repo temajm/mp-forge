@@ -2,7 +2,7 @@ import "./FAQPanel.scss"
 
 import React from "react";
 
-import {Button, Input, Space, Collapse, Form, Skeleton, Popconfirm, theme} from "antd"
+import {Button, Input, Space, Collapse, Form, Skeleton, Popconfirm, theme, Select } from "antd"
 import {
     SearchOutlined,
     RedoOutlined,
@@ -22,7 +22,7 @@ export default class FAQPanel extends React.Component {
         this.state = {
             waitLoadingData: true,
             blockRequests: false,
-            textsList: {},
+            textsList: [],
             collapseActiveKey: null,
             cacheCollapseActiveKey: null,
             isAddedNewTextMode: false,
@@ -35,6 +35,7 @@ export default class FAQPanel extends React.Component {
                 a: ""
             },
             searchText: "",
+            langTextsList: [],
         }
     }
 
@@ -44,12 +45,13 @@ export default class FAQPanel extends React.Component {
 
     loadData = () => {
         this.setState({
-            waitLoadingData: true,
-            collapseActiveKey: null,
-            textsList: {}
-        })
+                waitLoadingData: true,
+                collapseActiveKey: null,
+                textsList: [],
+                langTextsList: [],
+            }
+        )
         WebApi.getFAQContent().then((data) => {
-            console.log(data);
             this.updateDataList(data);
 
         }).catch((data) => {
@@ -66,9 +68,32 @@ export default class FAQPanel extends React.Component {
 
     updateDataList = (data) => {
         this.dataList = data;
-        this.setState({
-            textsList: data,
-            waitLoadingData: false
+        WebApi.getLangTextsList().then((langs) => {
+            let texts = {};
+
+            for (let i = 0; i < langs.length; i++) {
+                let element = langs[i];
+
+                if (texts[element.title] == null) {
+                    texts[element.title] = {}
+                }
+                texts[element.title][element.lang] = element.text;
+                texts[element.title].isSystem = element.isSystem;
+            }
+            this.setState({
+                textsList: data,
+                waitLoadingData: false,
+                langTextsList: texts
+            })
+        }).catch((data) => {
+            this.setState({
+                waitLoadingData: false,
+                collapseActiveKey: null
+            })
+            this.props.apiNotification.error({
+                message: "Невозможно загрузить данные",
+                description: `Произошла ошибка: ${JSON.stringify(data)}`
+            })
         })
     }
 
@@ -81,34 +106,40 @@ export default class FAQPanel extends React.Component {
             }
         } else {
             let index = 0;
+            const langNames = [];
+            for (const title in this.state.langTextsList) {
+                langNames.push({value: title, label: this.state.langTextsList[title]?.ru ? this.state.langTextsList[title]?.ru : title})
+            }
             if (this.state.isAddedNewTextMode) {
                 collapseList.push(<Collapse.Panel header={<div><ClockCircleOutlined
 
-                    style={{marginRight: '10px', color: theme.defaultConfig.token.colorInfo}}/>1234</div>} key={'create'}>
+                    style={{marginRight: '10px', color: theme.defaultConfig.token.colorInfo}}/>{this.state.createInputs.q?.length > 0 ? this.state.langTextsList[this.state.createInputs.q]?.ru : "..."}</div>} key={'create'}>
                     <Form
                         layout={"vertical"}
                     >
                         <Form.Item label="Вопрос:"
-                                   tooltip="Напишите максимально понятно вопрос">
-                            <Input.TextArea status={this.state.stateCreateInputs.q} style={{fontSize: 16}} value={this.state.createInputs.q} onChange={(e) => {
-                                this.state.createInputs.q = e.target.value;
+                                   tooltip="Напишите псевдоназвание текста вопроса (из языкового пакета)">
+                            <Select options={langNames} showSearch status={this.state.stateCreateInputs.q} style={{fontSize: 16}} value={this.state.createInputs.q} onChange={(e) => {
+                                console.log(e)
+
+                                this.state.createInputs.q = e;
                                 this.state.stateCreateInputs.q = "";
                                 this.setState({
                                     createInputs: this.state.createInputs,
                                     stateCreateInputs: this.state.stateCreateInputs
                                 })
-                            }} rows={3} placeholder="Введите вопрос"/>
+                            }} placeholder="Выберите псевдоназвание текста вопроса"/>
                         </Form.Item>
                         <Form.Item label="Ответ:"
-                                   tooltip="Ответ на введенный вопрос">
-                            <Input.TextArea status={this.state.stateCreateInputs.a} style={{fontSize: 16}} value={this.state.createInputs.a} onChange={(e) => {
-                                this.state.createInputs.a = e.target.value;
+                                   tooltip="Напишите псевдоназвание текста ответа (из языкового пакета)">
+                            <Select options={langNames} showSearch status={this.state.stateCreateInputs.a} style={{fontSize: 16}} value={this.state.createInputs.a} onChange={(e) => {
+                                this.state.createInputs.a = e;
                                 this.state.stateCreateInputs.a = ""
                                 this.setState({
                                     createInputs: this.state.createInputs,
                                     stateCreateInputs: this.state.stateCreateInputs
                                 })
-                            }} rows={6} placeholder="Введите ответ"/>
+                            }} placeholder="Выберите псевдоназвание текста ответа"/>
                         </Form.Item>
                         <Form.Item style={{display: "flex", justifyContent: "right"}}>
                             <Popconfirm
@@ -119,7 +150,7 @@ export default class FAQPanel extends React.Component {
                                 disabled={this.state.blockRequests}
                                 onConfirm={() => {
                                     console.log(this.state.createInputs.title?.length)
-                                    if(this.state.createInputs.q?.length == 0){
+                                    if(this.state.createInputs?.q == null || this.state.createInputs.q?.length == 0){
                                         this.state.stateCreateInputs.q = "error";
                                         this.setState({
                                             stateCreateInputs: this.state.stateCreateInputs
@@ -130,7 +161,7 @@ export default class FAQPanel extends React.Component {
                                         })
                                         return;
                                     }
-                                    if(this.state.createInputs.a?.length == 0){
+                                    if(this.state.createInputs?.a == null || this.state.createInputs.a?.length == 0){
                                         this.state.stateCreateInputs.a = "error";
                                         this.setState({
                                             stateCreateInputs: this.state.stateCreateInputs
@@ -144,10 +175,10 @@ export default class FAQPanel extends React.Component {
                                     this.setState({
                                         blockRequests: true
                                     })
-                                    WebApi.addLangText(this.state.createInputs.title, this.state.createInputs.ru, this.state.createInputs.en).then(()=>{
+                                    WebApi.addFAQContent(this.state.createInputs.q, this.state.createInputs.a).then(()=>{
                                         this.props.apiNotification.success({
-                                            message: "Успешно создали текст",
-                                            description: `Вы успешно создали текст под названием: ${this.state.createInputs.title}`
+                                            message: "Успешно создали вопрос-ответ",
+                                            description: `Вы успешно создали вопрос-ответ: ${this.state.createInputs.q}`
                                         })
                                         this.setState({
                                             blockRequests: false,
@@ -158,7 +189,7 @@ export default class FAQPanel extends React.Component {
                                         this.loadData();
                                     }).catch((data) => {
                                         this.props.apiNotification.error({
-                                            message: "Невозможно создать текст",
+                                            message: "Невозможно создать вопрос-ответ",
                                             description: `Произошла ошибка: ${JSON.stringify(data)}`
                                         })
                                         this.setState({
@@ -176,55 +207,57 @@ export default class FAQPanel extends React.Component {
                     </Form>
                 </Collapse.Panel>);
             }
-            for (const title in this.state.textsList) {
-                let element = this.state.textsList[title];
+            for (let i = 0; i < this.state.textsList.length; i++) {
+                let element = this.state.textsList[i];
                 if(!this.state.isAddedNewTextMode || this.state.searchText.length > 0){
                     let searchText = this.state.searchText.toLowerCase();
                     let isFounded = false;
-                    isFounded |= title.toLowerCase().includes(searchText)
-                    isFounded |= element.ru.toLowerCase().includes(searchText)
-                    isFounded |= element.en.toLowerCase().includes(searchText)
+                    if(this.state.langTextsList[element?.question]?.ru){
+                        isFounded |= this.state.langTextsList[element?.question]?.ru.toLowerCase()?.includes(searchText)
+                    }
+                    if(this.state.langTextsList[element?.answer]?.ru){
+                        isFounded |= this.state.langTextsList[element?.answer]?.ru.toLowerCase()?.includes(searchText)
+                    }
+                    isFounded |= element?.question?.toLowerCase()?.includes(searchText)
+                    isFounded |= element?.answer?.toLowerCase()?.includes(searchText)
                     if(!isFounded) continue;
                 }
                 collapseList.push(<Collapse.Panel disabled={this.state.isAddedNewTextMode}
-                                                  header={<div>{element?.isSystem ? <InfoCircleOutlined style={{
-                                                      marginRight: '10px',
-                                                      color: theme.defaultConfig.token.colorWarning
-                                                  }}/> : null}{title}</div>} key={index}>
+                                                  header={<div>{this.state.langTextsList[element.question] != null ? this.state.langTextsList[element.question]?.ru != null ? this.state.langTextsList[element.question].ru : element.question : element.question}</div>} key={i}>
                     <Form
                         layout={"vertical"}
                     >
-                        <Form.Item label="Русская версия текста:"
-                                   tooltip="Введенный текст будет отображаться у пользователей, использующих русский языковый пакет">
-                            <Input.TextArea style={{fontSize: 16}} disabled={element?.ru === undefined}
-                                            value={element?.ru != null ? element.ru : ""} onChange={(e) => {
-                                element.ru = e.target.value;
+                        <Form.Item label="Вопрос:"
+                                   tooltip="Напишите псевдоназвание текста вопроса (из языкового пакета)">
+                            <Select options={langNames} showSearch style={{fontSize: 16}} disabled={element?.question === undefined}
+                                            value={element?.question != null ? element.question : ""} onChange={(e) => {
+                                element.question = e;
                                 this.setState({textsList: this.state.textsList})
-                            }} rows={6} placeholder="Русская версия текста"/>
+                            }} rows={3} placeholder="Выберите псевдоназвание текста вопроса"/>
                         </Form.Item>
-                        <Form.Item label="Английская версия текста:"
-                                   tooltip="Введенный текст будет отображаться у пользователей, использующих английский языковый пакет">
-                            <Input.TextArea style={{fontSize: 16}} disabled={element?.en === undefined}
-                                            value={element?.en != null ? element.en : ""} onChange={(e) => {
-                                element.en = e.target.value;
+                        <Form.Item label="Ответ:"
+                                   tooltip="Напишите псевдоназвание текста ответа (из языкового пакета)">
+                            <Select options={langNames} showSearch style={{fontSize: 16}} disabled={element?.answer === undefined}
+                                            value={element?.answer != null ? element.answer : ""} onChange={(e) => {
+                                element.answer = e;
                                 this.setState({textsList: this.state.textsList})
-                            }} rows={6} placeholder="Английская версия текста"/>
+                            }} rows={6} placeholder="Выберите псевдоназвание текста ответа"/>
                         </Form.Item>
                         <Form.Item style={{display: "flex", justifyContent: "right"}}>
                             <Popconfirm
-                                title="Удалить текст"
-                                description="Вы точно желаете удалить данный текст?"
+                                title="Удалить вопрос-ответ"
+                                description="Вы точно желаете удалить данный вопрос-ответ?"
                                 okText={"Да"}
                                 cancelText={"Нет"}
-                                disabled={this.state.blockRequests || element.isSystem}
+                                disabled={this.state.blockRequests}
                                 onConfirm={() => {
                                     this.setState({
                                         blockRequests: true
                                     })
-                                    WebApi.removeLangText(title).then((data) => {
+                                    WebApi.removeFAQContent(element.id).then((data) => {
                                         this.props.apiNotification.success({
-                                            message: "Успешно удалили текст",
-                                            description: `Вы успешно удалили текст под названием: ${title}`
+                                            message: "Успешно удалили вопрос-ответ",
+                                            description: `Вы успешно удалили вопрос-ответ: ${this.state.langTextsList[element.question]?.ru}`
                                         })
                                         this.setState({
                                             blockRequests: false
@@ -232,7 +265,7 @@ export default class FAQPanel extends React.Component {
                                         this.loadData();
                                     }).catch((data) => {
                                         this.props.apiNotification.error({
-                                            message: "Невозможно создать текст",
+                                            message: "Невозможно создать вопрос-ответ",
                                             description: `Произошла ошибка: ${JSON.stringify(data)}`
                                         })
                                         this.setState({
@@ -248,17 +281,25 @@ export default class FAQPanel extends React.Component {
                                     />
                                 }
                             >
-                                <Button disabled={this.state.blockRequests || element.isSystem} danger
+                                <Button disabled={this.state.blockRequests} danger
                                         htmlType="submit">
                                     Удалить
                                 </Button>
                             </Popconfirm>
                             <Button disabled={this.state.blockRequests} ghost type="primary"
                                     style={{marginLeft: '16px'}} onClick={(e) => {
-                                WebApi.setLangText(title, element.ru, element.en).then(() => {
+                                WebApi.setFAQContent(element.id, element.question, element.answer).then(() => {
                                     this.setState({blockRequests: false})
-                                }).catch(() => {
+                                    this.props.apiNotification.success({
+                                        message: "Успешно обновили вопрос-ответ",
+                                        description: `Вы успешно обновили вопрос-ответ: ${this.state.langTextsList[element.question]?.ru}`
+                                    })
+                                }).catch((data) => {
                                     this.setState({blockRequests: false})
+                                    this.props.apiNotification.error({
+                                        message: "Невозможно загрузить данные",
+                                        description: `Произошла ошибка: ${JSON.stringify(data)}`
+                                    })
                                 })
                             }}>
                                 Обновить
@@ -266,7 +307,6 @@ export default class FAQPanel extends React.Component {
                         </Form.Item>
                     </Form>
                 </Collapse.Panel>)
-                index += 1;
             }
         }
         return (

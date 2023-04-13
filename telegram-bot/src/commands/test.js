@@ -9,8 +9,10 @@ export default class commandTest extends Command{
     run = async(user, msg, args) => {
         const keyboard = await user.buildKeyboard('welcome',{"welcomeswitchlang": [user.lang === "ru" ? "en" : "ru"]});
         await user.sendMessage("text_welcome", {
-            reply_markup: {...keyboard}
+            reply_markup: {...keyboard},
+            parse_mode: 'html'
         })
+        await Core.Telegram.get().sendPhoto(user.id, "https://i.imgur.com/O8mSoFN.jpeg");
         /*
         console.log(Core.Keyboards.build('general'))
         user.getText("welcome_text").then((data)=>{

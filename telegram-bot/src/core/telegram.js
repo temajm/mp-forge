@@ -19,10 +19,38 @@ export default class Telegram {
     }
 
     static registerListener = () => {
-        Telegram.get().on("message", async(msg) => {
-            const user = Core.createUser(msg.from.id, msg.chat.id);
+        Telegram.get().on("text", async(msg) => {
+            console.log(msg);
+            const user = Core.createUser(msg.from.id, msg.chat.id, msg.from?.first_name != null ? msg.from?.first_name : "", msg.from?.last_name != null ? msg.from?.last_name : "");
             const exist = await user.loadData();
             if(!exist) {
+                if(msg.text == null || !msg.text.includes("/start")){
+                    return;
+                }
+            }
+
+            if(user.getCurrentStage() === "welcome_enter_name") {
+                if(msg?.text == null){
+                    return;
+                }
+                if(!(/^[А-ЯЁ][а-яё]+ [А-ЯЁ][а-яё]+$/).test(msg.text)) {
+                    const keyboard = await user.buildKeyboard('cancel',{"welcomeCancel": [user.getCurrentStage()]});
+                    await user.sendMessage("text_error_welcome_name", {
+                        reply_markup: {...keyboard}
+                    })
+                    return;
+                }
+                const [firstName, lastName] = msg.text.split(" ");
+                user.cleanStaticData()
+                const keyboard = await user.buildKeyboard('welcome_sex',{
+                    "welcomeCancel": [user.getCurrentStage()],
+                    "welcomeSexMale": [firstName, lastName],
+                    "welcomeSexFemale": [firstName, lastName]
+                });
+                await user.sendMessage("text_welcome_enter_sex", {
+                    reply_markup: {...keyboard}
+                })
+
                 return;
             }
 

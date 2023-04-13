@@ -17,7 +17,8 @@ export default class CurrentMessage {
         }
 
         await this.user.sendMessage(message_text, {
-            reply_markup: reply_markup
+            reply_markup: reply_markup,
+            parse_mode: 'html'
         })
 
         return false;
@@ -30,8 +31,19 @@ export default class CurrentMessage {
         }
 
         let gText = await this.user.getText(message_text)
-        await Telegram.get().editMessageText(gText, {message_id: this.message.message_id, chat_id: this.message.chat.id} )
-        await Telegram.get().editMessageReplyMarkup(reply_markup, {message_id: this.message.message_id, chat_id: this.message.chat.id} )
+        await Telegram.get().editMessageText(gText, {message_id: this.message.message_id, chat_id: this.message.chat.id, parse_mode: 'html'} )
+        await Telegram.get().editMessageReplyMarkup(reply_markup, {message_id: this.message.message_id, chat_id: this.message.chat.id, parse_mode: 'html'} )
+    }
+
+    editNative = async(message_text, reply_markup) => {
+        let isValidate = await this.checkValidate(message_text, reply_markup);
+        if(!isValidate) {
+            return;
+        }
+
+        let gText = message_text
+        await Telegram.get().editMessageText(gText, {message_id: this.message.message_id, chat_id: this.message.chat.id, parse_mode: 'html'} )
+        await Telegram.get().editMessageReplyMarkup(reply_markup, {message_id: this.message.message_id, chat_id: this.message.chat.id, parse_mode: 'html'} )
     }
 
     editText = async(message_text) => {
@@ -41,7 +53,7 @@ export default class CurrentMessage {
         }
 
         let gText = await this.user.getText(message_text)
-        await Telegram.get().editMessageText(gText, {message_id: this.message.message_id, chat_id: this.message.chat.id} )
+        await Telegram.get().editMessageText(gText, {message_id: this.message.message_id, chat_id: this.message.chat.id, parse_mode: 'html'} )
     }
 
     editMarkup = async(reply_markup) => {
@@ -50,7 +62,7 @@ export default class CurrentMessage {
             return;
         }
 
-        await Telegram.get().editMessageReplyMarkup(reply_markup, {message_id: this.message.message_id, chat_id: this.message.chat.id} )
+        await Telegram.get().editMessageReplyMarkup(reply_markup, {message_id: this.message.message_id, chat_id: this.message.chat.id, parse_mode: 'html'} )
     }
 
 }

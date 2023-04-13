@@ -44,6 +44,7 @@ export default class Keyboards {
                     }
 
                     const btn = btnLine[idBtn];
+                    let isDeletted = false;
 
                     const nextStage = () => {
                         if(typeof argsOfButton === "object") {
@@ -51,16 +52,21 @@ export default class Keyboards {
                                 if (!Array.isArray(argsOfButton[argsOfButtonKey]) || argsOfButton[argsOfButtonKey].length === 0) {
                                     continue;
                                 }
-                                if(btn?.callback_data.toLowerCase() === argsOfButtonKey.toLowerCase()){
-                                    btn.callback_data = `${argsOfButtonKey} ${argsOfButton[argsOfButtonKey].join(" ")}`
+                                if((btn?.pseudo != null ? btn?.pseudo.toLowerCase() : btn?.callback_data.toLowerCase()) === argsOfButtonKey.toLowerCase()){
+                                    if(argsOfButton[argsOfButtonKey].length > 0 && argsOfButton[argsOfButtonKey][0] === undefined){
+                                        btnLine.splice(idBtn, 1);
+                                        isDeletted = true;
+                                        continue;
+                                    }
+                                    btn.callback_data = `${btn?.callback_data.split(" ")[0]} ${argsOfButton[argsOfButtonKey].join(" ")}`
                                     break;
                                 }
                             }
                         }
-                        goBtn(idBtn + 1);
+                        goBtn(idBtn + (isDeletted ? 0 : 1));
                     }
 
-                    if(btn?.text && user != null){
+                    if(btn?.text && user != null && !isDeletted){
                         const text = btn.text.toLowerCase();
                         user.getText(text).then((data)=>{
                             btn.text = data;
