@@ -2,7 +2,7 @@ import axios from "axios"
 
 export default class WebApi {
 
-    static serverName = "http://127.0.0.1:3003/api/"
+    static serverName = "http://62.109.22.8:3003/api/"
 
     static setLangText = (title, ru, en) => {
         return new Promise((resolve, reject) => {

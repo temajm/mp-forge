@@ -129,7 +129,7 @@ class App extends React.Component {
 const App = () => {
     const [collapsed, setCollapsed] = useState(window.innerWidth < 600);
     const [selectedTheme, setSelectedTheme] = useState("dark");
-    const [selectedMenuItem, setSelectedMenuItem] = useState('divisions');
+    const [selectedMenuItem, setSelectedMenuItem] = useState('general');
 
     const [apiNotif, contextHolder] = notification.useNotification();
 
