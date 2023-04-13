@@ -8,8 +8,12 @@ const products = [
         photo: `text_products_url_1`
     },
     {
-        text: `text_products_1`,
-        photo: `text_products_url_1`
+        text: `text_products_2`,
+        photo: `text_products_url_2`
+    },
+    {
+        text: `text_products_3`,
+        photo: `text_products_url_3`
     }
 ]
 

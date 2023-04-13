@@ -57,7 +57,7 @@
     "menu": {
       "buttons": [
         [
-          {"text": "button_tasks", "callback_data": "menuTasks"}
+          {"text": "button_inst", "callback_data": "menuInst"}
         ],
         [
           {"text": "button_div", "callback_data": "menuDiv"},

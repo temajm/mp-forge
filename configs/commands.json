@@ -8,10 +8,6 @@
       "description": "Главное меню"
     },
     {
-      "name": "instructions",
-      "description": "Инструкции"
-    },
-    {
       "name": "company",
       "description": "Информация о компании"
     },
@@ -22,10 +18,6 @@
     {
       "name": "settings",
       "description": "Настройки"
-    },
-    {
-      "name": "test",
-      "description": "test"
     }
   ]
 }

@@ -59,6 +59,22 @@ export default class DatabaseManager {
         }))
     }
 
+    static getInstList = (offset = 0, divisionId) => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT * FROM `instructions` WHERE `divisionId` = -1 OR `divisionId` = ? ORDER BY `id` ASC LIMIT ?, 6', [divisionId, offset], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+
+    static getInstsListCount = (divisionId) => {
+        return new Promise(((resolve, reject) => {
+            DatabaseManager.mysqlConnection.query('SELECT COUNT(*) as \'count\' FROM `instructions` WHERE `divisionId` = -1 OR `divisionId` = ?', [divisionId], (error, results, fields) => {
+                this.#handleData(resolve, reject, error, results, fields);
+            })
+        }))
+    }
+
     static getFAQListCount = () => {
         return new Promise(((resolve, reject) => {
             DatabaseManager.mysqlConnection.query('SELECT COUNT(*) as \'count\' FROM `faq`', [], (error, results, fields) => {
